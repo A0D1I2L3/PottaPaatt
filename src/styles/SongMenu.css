@@ -1,0 +1,106 @@
+
+body {
+  margin: 0;
+  background-color: #000;
+  color: white;
+  font-family: 'AwesomeSerif', serif;
+}
+
+.song-menu-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem;
+}
+
+.song-menu-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.song-menu-header .title {
+  font-family: 'AwesomeSerifItalic', serif;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.song-menu-header .subtitle {
+  color: #aaa;
+  font-size: 0.9rem;
+  font-family: 'AwesomeSerif', serif;
+}
+
+.song-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1000px;
+  border: 1px solid #444;
+  padding: 2rem;
+  border-radius: 12px;
+}
+
+.song-card {
+  background-color: #222;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.song-card:hover {
+  transform: scale(1.03);
+}
+
+.album-art {
+  width: 100%;
+  display: block;
+}
+
+.song-info {
+  padding: 1rem;
+}
+
+.song-title {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.song-artist {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.spotify-badge {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.5;
+}
+
+.easter-eggs {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 1rem;
+  font-size: 1rem;
+
+}
+
+.below-box-msg {
+  text-align: left;
+  color: #aaa;
+  font-family: 'AwesomeSerif', serif;
+  margin-top: 0.5rem;
+}
+
+.bottom-right-msg {
+  position: fixed;
+  bottom: 10px;
+  right: 16px;
+  color: #aaa;
+  font-family: 'AwesomeSerif', serif;
+  opacity: 0.7;
+  pointer-events: none;
+}

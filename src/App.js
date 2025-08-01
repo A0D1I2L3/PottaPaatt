@@ -1,12 +1,18 @@
-import logo from './logo.svg';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import SlingVolumeControl from './components/volume';
+import Home from './components/Home';
+import SongMenu from './components/SongMenu';
+import SongCard from './components/SongCard';
 
 function App() {
   return (
-    <div className="App">
-      <SlingVolumeControl />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/menu" element={<SongMenu />} />
+        <Route path="/play/:songId" element={<SongCard />} />
+      </Routes>
+    </Router>
   );
 }
 

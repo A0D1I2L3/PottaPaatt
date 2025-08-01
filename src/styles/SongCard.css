@@ -1,0 +1,117 @@
+.songcard-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  color: white;
+  overflow: hidden;
+  font-family: 'Libre Baskerville', serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* vertical centering */
+  text-align: center;
+}
+
+.songcard-heading {
+  margin-bottom: 2rem;
+}
+
+.songcard-heading h1 {
+  font-style: italic;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.songcard-heading p {
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
+.songcard-answer-box {
+  border: 1px solid white;
+  border-radius: 999px;
+  padding: 1rem 2rem;
+  min-height: 3rem;
+  width: 60vw;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chosen-letter {
+  margin: 0 0.3rem;
+}
+
+/* Easter Egg below answer box */
+.easter-egg-bottom {
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 0.5rem;
+}
+
+/* Easter Egg fixed to bottom right */
+.easter-egg-corner {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Letter drag zone */
+.drag-letter-pool {
+  position: absolute;
+  bottom: 30%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 25vh;
+  pointer-events: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Floating letters */
+.drag-letter {
+  position: relative;
+  font-size: 1.6rem;
+  margin: 0.5rem;
+  animation: floatBump 4s ease-in-out infinite;
+  pointer-events: auto;
+  user-select: none;
+  cursor: grab;
+}
+
+@keyframes floatBump {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(360deg);
+  }
+}
+
+.congrats-screen {
+  text-align: center;
+  position: absolute;
+
+    font-family: 'AwesomeSerif', serif;
+  color: white;
+}
+.congrats-screen h1{
+    font-family: 'AwesomeSerifitalic', serif;
+    font-size: 2rem;
+  color: white;
+
+}
+
+.congrats-screen p {
+  font-weight: normal;
+}

@@ -1,0 +1,40 @@
+.home-screen {
+  background-color: black;
+  height: 100vh;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: 'AwesomeSerifItalic', sans-serif;
+  text-align: center;
+}
+
+.fade-text {
+  font-size: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-text.visible {
+  opacity: 1;
+}
+
+.fade-text.hidden {
+  opacity: 0;
+}
+
+.get-started {
+  background-color: white;
+  color: black;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.get-started:hover {
+  background-color: #444;
+  color: white;
+}
