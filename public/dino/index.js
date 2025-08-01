@@ -1,4 +1,4 @@
-  // Unified Dino Game
+// Unified Dino Game
   class Cactus {
     constructor(ctx, x, y, width, height, image) {
       this.ctx = ctx;
@@ -239,7 +239,7 @@
   let gameOver = false;
   let hasAddedEventListenersForRestart = false;
   let onGameOverCallback = null;
-  let waitingToStart = false;
+  let waitingToStart = true; // Only start game after user clicks
 
   function getScaleRatio() {
     const screenHeight = Math.min(
@@ -325,64 +325,132 @@
 
   function reset() {
     hasAddedEventListenersForRestart = false;
-    gameOver = true;
-    waitingToStart = true;
+    gameOver = false;
+    waitingToStart = false;
     player.cleanup();
-    // createSprites();
-    // gameSpeed = GAME_SPEED_START;
+    createSprites();
+    gameSpeed = GAME_SPEED_START;
+    previousTime = null;
+    requestAnimationFrame(gameLoop);
   }
 
   function setupGameReset() {
-    if (!hasAddedEventListenersForRestart) {
-      hasAddedEventListenersForRestart = true;
-      setTimeout(() => {
-        window.addEventListener("keyup", reset, { once: true });
-        window.addEventListener("touchstart", reset, { once: true });
-      }, 1000);
+  if (hasAddedEventListenersForRestart) return;
+  hasAddedEventListenersForRestart = true;
+
+  const restart = (e) => {
+    // // Only restart on Space key, mouse click, or touch
+    // if (
+    //   (e.type === "keydown" && e.code !== "Space") ||
+    //   (e.type === "mousedown" && e.button !== 0)
+    // ) {
+    //   return;
+    // }
+    // // Prevent restart if not on game over screen
+    // if (!gameOver) return;
+
+    // window.removeEventListener("keydown", restart);
+    // window.removeEventListener("mousedown", restart);
+    // window.removeEventListener("touchstart", restart);
+    // hasAddedEventListenersForRestart = false;
+    // reset();
+    return;
+  };
+
+  window.addEventListener("keydown", restart);
+  window.addEventListener("mousedown", restart);
+  window.addEventListener("touchstart", restart);
+}
+
+  let pausedByParent = false;
+  let pauseOverlay = null;
+  let animationFrameId = null;
+
+  function showPauseOverlay() {
+    if (!pauseOverlay) {
+      pauseOverlay = document.createElement("div");
+      pauseOverlay.style.position = "fixed";
+      pauseOverlay.style.inset = "0";
+      pauseOverlay.style.zIndex = "10000";
+      pauseOverlay.style.background = "black";
+      pauseOverlay.style.pointerEvents = "auto";
+      document.body.appendChild(pauseOverlay);
     }
   }
 
-  function gameLoop(currentTime) {
-    if (previousTime === null) {
-      previousTime = currentTime;
-      requestAnimationFrame(gameLoop);
-      return;
+  function hidePauseOverlay() {
+    if (pauseOverlay) {
+      document.body.removeChild(pauseOverlay);
+      pauseOverlay = null;
     }
+  }
 
-    const delta = currentTime - previousTime;
+  function pauseGameLoop() {
+    pausedByParent = true;
+    showPauseOverlay();
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  }
+
+  function resumeGameLoop() {
+    if (pausedByParent) {
+      pausedByParent = false;
+      hidePauseOverlay();
+      requestAnimationFrame(gameLoop);
+    }
+  }
+
+  // Listen for parent messages
+  window.addEventListener("message", (e) => {
+    if (e.data === "PAUSE") {
+      pauseGameLoop();
+    } else if (e.data === "RESUME") {
+      resumeGameLoop();
+    }
+  });
+
+  // Patch gameLoop to use animationFrameId
+  function gameLoop(currentTime) {
+  if (pausedByParent) return;
+  animationFrameId = requestAnimationFrame(gameLoop);
+
+  if (waitingToStart) return;
+
+  if (previousTime === null) {
     previousTime = currentTime;
-
-    clearScreen();
-
-  if (gameOver) {
-    ground.draw();
-    cactiController.draw();
-    player.draw();
-    requestAnimationFrame(gameLoop);
     return;
   }
 
-    if (!gameOver) {
-      ground.update(gameSpeed, delta);
-      cactiController.update(gameSpeed, delta);
-      player.update(gameSpeed, delta);
-      updateGameSpeed(delta);
-    }
+  const delta = currentTime - previousTime;
+  previousTime = currentTime;
 
-    if (!gameOver && cactiController.collideWith(player)) {
+  if (!gameOver) {
+    clearScreen(); // <-- Only clear when game is active
+
+    ground.update(gameSpeed, delta);
+    cactiController.update(gameSpeed, delta);
+    player.update(gameSpeed, delta);
+
+    ground.draw();
+    cactiController.draw();
+    player.draw();
+
+    updateGameSpeed(delta);
+
+    if (cactiController.collideWith(player)) {
       gameOver = true;
       showGameOver();
       setupGameReset();
       if (onGameOverCallback) onGameOverCallback();
       window.parent.postMessage('GAME_OVER', '*');
     }
-
-    ground.draw();
-    cactiController.draw();
-    player.draw();
-
-    requestAnimationFrame(gameLoop);
+  } else {
+    // Do not clear the screen or update game objects
+    showGameOver(); // Only draw "GAME OVER" on top of last frame
   }
+}
 
   export function setupGame({ onGameOver } = {}) {
     canvas = document.getElementById("game");
@@ -396,7 +464,7 @@
     }
     window.addEventListener("resize", () => setTimeout(setScreen, 500));
 
-    requestAnimationFrame(gameLoop);
+    // Don't start gameLoop here, it's started in DOMContentLoaded and waits for waitingToStart
   }
 
   // Get song ID from URL
@@ -420,23 +488,31 @@
     }
   }
 
-  window.addEventListener("DOMContentLoaded", () => {
-    const overlay = document.createElement("div");
-    overlay.style.position = "fixed";
-    overlay.style.inset = "0";
-    overlay.style.zIndex = "9999";
-    overlay.style.background = "transparent";
-    document.body.appendChild(overlay);
+  function showClickToPlay() {
+    if (!canvas || !ctx) return;
+    clearScreen();
+    const fontSize = 70 * scaleRatio;
+    ctx.font = `${fontSize}px Verdana`;
+    ctx.fillStyle = "grey";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Click to play", canvas.width / 2, canvas.height / 2);
+  }
 
-    const unlock = () => {
-      window.focus();
-      document.getElementById("focus-hack")?.focus();
-      setupGame(); // replace with your actual game init
-      document.body.removeChild(overlay);
-      document.removeEventListener("click", unlock);
-      document.removeEventListener("touchstart", unlock);
-    };
+window.addEventListener("DOMContentLoaded", () => {
+  canvas = document.getElementById("game");
+  ctx = canvas.getContext("2d");
+  setScreen();
+  setupGame();
 
-    document.addEventListener("click", unlock);
-    document.addEventListener("touchstart", unlock);
-  });
+  // Simulate actual click + focus
+  canvas.click();
+  canvas.focus();
+
+  // Start everything immediately
+  waitingToStart = false;
+  startMusic();
+  window.parent?.postMessage?.('GAME_STARTED', '*');
+  requestAnimationFrame(gameLoop);
+});
+

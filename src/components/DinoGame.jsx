@@ -2,22 +2,30 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function DinoGame({ onStart, onGameOver }) {
   const [gameStarted, setGameStarted] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
   const iframeRef = useRef(null);
+
   useEffect(() => {
     const handler = (e) => {
       if (e.data === 'GAME_OVER') {
         onGameOver?.();
-        setGameStarted(false); // prevent restart
+        setGameStarted(false);
+        setGameOver(true);
+      }
+      if (e.data === 'GAME_STARTED') {
+        onStart?.();
+        setGameStarted(true);
+        setGameOver(false);
       }
     };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, [onGameOver]);
+  }, [onGameOver, onStart]);
 
   const handleIframeLoad = () => {
-    if (!gameStarted) {
-      setGameStarted(true);
-      onStart?.();
+    // Prevent restarting if game is over
+    if (!gameStarted && !gameOver) {
+      // Wait for the iframe to send GAME_STARTED before setting gameStarted
     }
   };
 

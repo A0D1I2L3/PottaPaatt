@@ -1,5 +1,5 @@
 import { useParams, useLocation } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import DinoGame from './DinoGame';
 import '../styles/SongCard.css';
 import PlingGame from './PlingGame';
@@ -33,7 +33,9 @@ function SongCard() {
   const [showPopup, setShowPopup] = useState(false);
   const [volume, setVolume] = useState(null);
   const [isPlingActive, setIsPlingActive] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
   const audioRef = useRef(null);
+  const dinoIframeRef = useRef(null);
 
   useEffect(() => {
     if (answer.join('') === stripped) {
@@ -45,6 +47,34 @@ function SongCard() {
     }
   }, [answer, stripped]);
 
+ useEffect(() => {
+    const handleBackspace = (e) => {
+      if (unlocked) return;
+      if (e.key === 'Backspace') {
+        e.preventDefault();
+        setAnswer((prevAnswer) => {
+          if (prevAnswer.length === 0) return prevAnswer;
+
+          const updated = [...prevAnswer];
+          const removedChar = updated.pop();
+
+          setLetters((prevLetters) => [
+            ...prevLetters,
+            {
+              char: removedChar,
+              id: Math.random().toString(36).substr(2, 5),
+              position: getRandomPosition(),
+            },
+          ]);
+
+          return updated;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleBackspace);
+    return () => window.removeEventListener('keydown', handleBackspace);
+  }, [unlocked]);
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -59,12 +89,28 @@ function SongCard() {
     return () => audio.removeEventListener('timeupdate', updateProgress);
   }, [unlocked]);
 
+  // Send pause/resume to DinoGame iframe
+  useEffect(() => {
+    if (!unlocked) return;
+    const iframe = document.querySelector('iframe[title="DinoGame"]');
+    if (!iframe) return;
+    if (showPopup) {
+      iframe.contentWindow?.postMessage('PAUSE', '*');
+    } else {
+      iframe.contentWindow?.postMessage('RESUME', '*');
+    }
+  }, [showPopup, unlocked]);
+
   const handleGameOver = () => {
+    setIsGameOver(true);
     audioRef.current?.pause();
   };
 
+  // Only play audio after DinoGame sends GAME_STARTED (after user click)
   const handleGameStart = () => {
-    audioRef.current?.play().catch(() => {});
+    if (!isGameOver && audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    }
   };
 
   const onDrop = e => {
@@ -132,14 +178,14 @@ function SongCard() {
               height: '80vh',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              position: 'relative'
             }}>
-              {!isPlingActive && (
-                <DinoGame
-                  onStart={handleGameStart}
-                  onGameOver={handleGameOver}
-                />
-              )}
+              <DinoGame
+                ref={dinoIframeRef}
+                onStart={handleGameStart}
+                onGameOver={handleGameOver}
+              />
             </div>
 
             <div style={{
@@ -219,23 +265,31 @@ function SongCard() {
               </div>
 
               <div>
-                <div
-                  style={{ display: 'flex', alignItems: 'left', gap: '5px', cursor: 'pointer' }}
-                  onClick={handleVolumeIconClick}
-                >
-                  <img
-                    src="/assets/images/dots.png"
-                    alt="volume dots"
-                    style={{ height: '32px', paddingRight: '90px' }}
-                  />
-                </div>
+                    <div
+  style={{
+    display: 'flex',
+    alignItems: 'left',
+    gap: '5px',
+    cursor: isGameOver ? 'not-allowed' : 'pointer',
+    opacity: isGameOver ? 0.3 : 1
+  }}
+  onClick={() => {
+    if (!isGameOver) handleVolumeIconClick();
+  }}
+>
+  <img
+    src="/assets/images/dots.png"
+    alt="volume dots"
+    style={{ height: '32px', paddingRight: '90px' }}
+  />
+</div>
 
-                {volume && (
-                  <div style={{ marginTop: '12px', fontFamily: 'AwesomeSerif', color: '#fff' }}>
-                    <b>{volume}</b>
-                  </div>
-                )}
-              </div>
+
+                    {volume !== null && (
+                    <div style={{ marginTop: '12px', fontFamily: 'AwesomeSerif', color: '#fff', fontSize: '32px', fontWeight: 'bold' }}>
+                    </div>
+                    )}
+                </div>
             </div>
           </div>
 
@@ -258,20 +312,24 @@ function SongCard() {
                 padding: '20px',
                 borderRadius: '10px'
               }}>
-                <PlingGame
-  audioRef={audioRef}
+               <PlingGame
   onVolumeSelect={(vol) => {
     if (audioRef.current) {
-      audioRef.current.volume = vol / 100; // 🔥 Set volume based on PlingGame result
-      audioRef.current
-        .play()
-        .then(() => {
-          setVolume(vol);
-          setShowPopup(false);
-          setIsPlingActive(false);
-        })
-        .catch(() => {});
+      audioRef.current.volume = Math.max(0, Math.min(1, vol / 100));
+      if (!isGameOver && progress > 0) {
+        audioRef.current.play().catch(() => {});
+      }
     }
+    setVolume(vol);
+    setShowPopup(false);
+    setIsPlingActive(false);
+
+    // FOCUS THE CANVAS inside iframe
+    setTimeout(() => {
+      const iframe = document.querySelector('iframe[title="DinoGame"]');
+      const canvas = iframe?.contentDocument?.querySelector('canvas');
+      if (canvas) canvas.focus();
+    }, 100); // short delay to ensure DOM is updated
   }}
 />
 

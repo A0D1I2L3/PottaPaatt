@@ -25,28 +25,33 @@
   </style>
 </head>
 <body>
-  
-  <canvas id="game" style="background-color: black; "></canvas>
+  <canvas id="game" style="background-color: black" tabindex="0""></canvas>
 
   <script type="module">
     import { setupGame } from './index.js';
 
     let started = false;
+    let gameOver = false;
 
     function startGame() {
-      if (started) return;
+      if (started || gameOver) return;
       started = true;
 
       setupGame({
         onGameOver: () => {
           window.parent?.postMessage?.('GAME_OVER', '*');
+          gameOver = true;
         }
       });
 
       window.parent?.postMessage?.('GAME_STARTED', '*');
     }
 
-    window.addEventListener('load', startGame);
+    window.addEventListener('message', (e) => {
+      if (e.data === 'START_GAME') {
+        startGame();
+      }
+    });
   </script>
 </body>
 </html>
