@@ -232,7 +232,7 @@ function SongCard() {
 
                 {volume && (
                   <div style={{ marginTop: '12px', fontFamily: 'AwesomeSerif', color: '#fff' }}>
-                    Volume fixed at: <b>{volume}</b>
+                    <b>{volume}</b>
                   </div>
                 )}
               </div>
@@ -253,19 +253,28 @@ function SongCard() {
               zIndex: 10000
             }}>
               <div style={{
-                background: 'white',
+                background: 'black',
                 border: '4px solid black',
-                padding: '40px',
+                padding: '20px',
                 borderRadius: '10px'
               }}>
                 <PlingGame
-                  onVolumeSelect={(vol) => {
-                    setVolume(vol);
-                    setShowPopup(false);
-                    setIsPlingActive(false);
-                    audioRef.current?.play().catch(() => {});
-                  }}
-                />
+  audioRef={audioRef}
+  onVolumeSelect={(vol) => {
+    if (audioRef.current) {
+      audioRef.current.volume = vol / 100; // 🔥 Set volume based on PlingGame result
+      audioRef.current
+        .play()
+        .then(() => {
+          setVolume(vol);
+          setShowPopup(false);
+          setIsPlingActive(false);
+        })
+        .catch(() => {});
+    }
+  }}
+/>
+
               </div>
             </div>
           )}
