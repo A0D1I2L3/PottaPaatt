@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dino Game</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    canvas {
+      border: none;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" style="background-color: black;"></canvas>
+
+  <script type="module">
+    import { setupGame } from './index.js';
+
+    let started = false;
+
+    function startGame() {
+      if (started) return;
+      started = true;
+
+      setupGame({
+        onGameOver: () => {
+          window.parent?.postMessage?.('GAME_OVER', '*');
+        }
+      });
+
+      window.parent?.postMessage?.('GAME_STARTED', '*');
+    }
+
+    window.addEventListener('load', startGame);
+  </script>
+</body>
+</html>

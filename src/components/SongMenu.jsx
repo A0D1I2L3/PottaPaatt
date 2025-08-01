@@ -2,10 +2,34 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/SongMenu.css'; 
 
 const songs = [
-  { id: 1, title: 'I Always Wanna Die (Sometimes)', artist: 'The 1975' },
-  { id: 2, title: 'Somebody Else', artist: 'The 1975' },
-  { id: 3, title: 'Love It If We Made It', artist: 'The 1975' },
-  { id: 4, title: 'Husn', artist: 'Anuv Jain' },
+  {
+    id: 1,
+    title: 'Starry eyes',
+    artist: 'Cigarettes After Sex',
+    file: '/audio/Starry eyes.mp3',
+    image: 'starry.png', 
+  },
+  {
+    id: 2,
+    title: 'Gul',
+    artist: 'Anuv Jain',
+    file: '/audio/Gul.mp3',
+    image: 'gul.png',
+  },
+  {
+    id: 3,
+    title: 'Sweden',
+    artist: 'C418',
+    file: '/audio/Sweden.mp3',
+    image: 'sweden.png',
+  },
+  {
+    id: 4,
+    title: 'Aaoge Tum Kabhi',
+    artist: 'The Local Train',
+    file: '/audio/Aaoge Tum Kabhi.mp3',
+    image: 'aaoge.png',
+  },
 ];
 
 function SongMenu() {
@@ -27,7 +51,7 @@ function SongMenu() {
 
           >
             <img
-              src="../../assets/images/placeholder.png"
+              src={`../../assets/images/${song.image}`}
               alt="Album Art"
               className="album-art"
             />
