@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 export default function DinoGame({ onStart, onGameOver }) {
   const [gameStarted, setGameStarted] = useState(false);
   const iframeRef = useRef(null);
-
   useEffect(() => {
     const handler = (e) => {
       if (e.data === 'GAME_OVER') {

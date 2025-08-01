@@ -1,5 +1,4 @@
 // Unified Dino Game
-
 class Cactus {
   constructor(ctx, x, y, width, height, image) {
     this.ctx = ctx;
@@ -326,11 +325,11 @@ function updateGameSpeed(delta) {
 
 function reset() {
   hasAddedEventListenersForRestart = false;
-  gameOver = false;
+  gameOver = true;
   waitingToStart = true;
   player.cleanup();
-  createSprites();
-  gameSpeed = GAME_SPEED_START;
+  // createSprites();
+  // gameSpeed = GAME_SPEED_START;
 }
 
 function setupGameReset() {

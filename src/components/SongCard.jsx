@@ -2,6 +2,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import DinoGame from './DinoGame';
 import '../styles/SongCard.css';
+import PlingGame from './PlingGame';
 
 const SONG_LIST = [
   { id: 1, title: 'Starry eyes', artist: 'Cigarettes After Sex' },
@@ -29,7 +30,9 @@ function SongCard() {
   const [unlocked, setUnlocked] = useState(false);
   const [showCongrats, setShowCongrats] = useState(false);
   const [progress, setProgress] = useState(0);
-
+  const [showPopup, setShowPopup] = useState(false);
+  const [volume, setVolume] = useState(null);
+  const [isPlingActive, setIsPlingActive] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -75,6 +78,12 @@ function SongCard() {
 
   const onDragStart = (e, id) => {
     e.dataTransfer.setData('text/plain', id);
+  };
+
+  const handleVolumeIconClick = () => {
+    setShowPopup(true);
+    setIsPlingActive(true);
+    audioRef.current?.pause();
   };
 
   return (
@@ -125,10 +134,12 @@ function SongCard() {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <DinoGame
-                onStart={handleGameStart}
-                onGameOver={handleGameOver}
-              />
+              {!isPlingActive && (
+                <DinoGame
+                  onStart={handleGameStart}
+                  onGameOver={handleGameOver}
+                />
+              )}
             </div>
 
             <div style={{
@@ -207,15 +218,57 @@ function SongCard() {
                 </div>
               </div>
 
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <img src="/assets/images/dots.png" alt="volume dots" style={{ height: '32px' }} />
+              <div>
+                <div
+                  style={{ display: 'flex', alignItems: 'left', gap: '5px', cursor: 'pointer' }}
+                  onClick={handleVolumeIconClick}
+                >
+                  <img
+                    src="/assets/images/dots.png"
+                    alt="volume dots"
+                    style={{ height: '32px', paddingRight: '90px' }}
+                  />
+                </div>
+
+                {volume && (
+                  <div style={{ marginTop: '12px', fontFamily: 'AwesomeSerif', color: '#fff' }}>
+                    Volume fixed at: <b>{volume}</b>
+                  </div>
+                )}
               </div>
             </div>
           </div>
+
+          {showPopup && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000
+            }}>
+              <div style={{
+                background: 'white',
+                border: '4px solid black',
+                padding: '40px',
+                borderRadius: '10px'
+              }}>
+                <PlingGame
+                  onVolumeSelect={(vol) => {
+                    setVolume(vol);
+                    setShowPopup(false);
+                    setIsPlingActive(false);
+                    audioRef.current?.play().catch(() => {});
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
           <audio ref={audioRef} src={`/assets/songs/${songId}.mp3`} loop />
         </>
