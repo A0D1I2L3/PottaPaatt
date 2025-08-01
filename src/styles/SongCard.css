@@ -107,11 +107,13 @@
 }
 .congrats-screen h1{
     font-family: 'AwesomeSerifitalic', serif;
-    font-size: 2rem;
+    font-size: 3rem;
   color: white;
 
 }
 
 .congrats-screen p {
+        font-size: 2rem;
+
   font-weight: normal;
 }
