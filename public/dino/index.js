@@ -311,7 +311,7 @@
     ctx.fillStyle = "grey";
     const x = canvas.width / 4.5;
     const y = canvas.height / 2;
-    ctx.fillText("GAME OVER", x, y);
+    ctx.fillText("YOU DIED!", x, y);
   }
 
   function clearScreen() {
