@@ -12,7 +12,7 @@
 
 ### Project Description
 
-React based muisc player that allows you to do everything EXCEPT actually listen to music.
+React based music player that allows you to do everything EXCEPT actually listen to music.
 
 ---
 
