@@ -1,5 +1,5 @@
 
-# Potta Paatt :trollface:
+# PottaPaatt :trollface:
 
 ## Basic Details
 
@@ -12,16 +12,15 @@
 
 ### Project Description
 
-A gloriously dysfunctional React-based music player that turns basic audio playback into a mildly infuriating experience.
-From unlocking songs with drag puzzles to using a Dino game for play control — it's less of a product and more of a cry for help.
+React based muisc player that allows you to do everything EXCEPT actually listen to music.
 
 ---
 
 ## The Problem (that doesn't exist)
 
 People were satisfied with Spotify, Apple Music, and YouTube.
-No one wanted a janky, feature-deprived, borderline-unusable music experience.
-So naturally, we made one.
+We could'nt have that. SO we built something no one would willingly use. 
+And we're proud of it.
 
 ---
 
@@ -29,9 +28,8 @@ So naturally, we made one.
 
 **Potta Paatt** solves this non-problem with:
 
-* A `<audio>` tag disguised as a React app
 * A Dino game that controls playback (die = silence)
-* A Plinko-based volume control system you’ll hate
+* A Plinko-based volume control system you’ll have a lot of fun using.
 * Absolutely zero sensible UX decisions
 
 ---
@@ -63,7 +61,7 @@ npm install
 npm start
 ```
 
-That’s it. Then hope the song loads and the Dino survives.
+Now you get to listen to songs. Congrats!
 
 ---
 
@@ -92,7 +90,6 @@ That’s it. Then hope the song loads and the Dino survives.
 
 ---
 
-Made with ❤️ and questionable choices at **TinkerHub Useless Projects**
 
 ![Static Badge](https://img.shields.io/badge/TinkerHub-24?color=%23000000\&link=https%3A%2F%2Fwww.tinkerhub.org%2F)
 ![Static Badge](https://img.shields.io/badge/UselessProjects--25-25?link=https%3A%2F%2Fwww.tinkerhub.org%2Fevents%2FQ2Q1TQKX6Q%2FUseless%2520Projects)
