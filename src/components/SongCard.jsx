@@ -51,6 +51,18 @@ function SongCard() {
       }, 2000);
     }
   }, [answer, stripped]);
+  function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  return isMobile;
+}
+
 
   useEffect(() => {
     const handleBackspace = (e) => {
@@ -179,6 +191,7 @@ function SongCard() {
     setIsPlingActive(true);
     audioRef.current?.pause();
   };
+const isMobile = useIsMobile();
 
   return (
     <div className="songcard-container">
@@ -239,13 +252,14 @@ function SongCard() {
             fontFamily: 'AwesomeSerif, serif'
           }}>
             <div style={{
-              width: '100%',
-              height: '80vh',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative'
-            }}>
+  width: '100%',
+  height: isMobile ? '80vh' : '80vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'relative'
+}}>
+
               <DinoGame
                 ref={dinoIframeRef}
                 onStart={handleGameStart}
@@ -254,22 +268,27 @@ function SongCard() {
             </div>
 
             <div style={{
-              width: '100%',
-              height: '20vh',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0 60px',
-              position: 'relative'
-            }}>
+  width: '100%',
+  height: isMobile ? '40vh' : '20vh',
+  display: 'flex',
+  flexDirection: isMobile ? 'column' : 'row',
+  alignItems: isMobile ? 'flex-start' : 'center',
+  justifyContent: isMobile ? 'center' : 'space-between',
+  padding: isMobile ? '20px' : '0 60px',
+  gap: isMobile ? '20px' : '0',
+  position: 'relative'
+}}>
+
               <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start'
-              }}>
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: isMobile ? 'center' : 'flex-start',
+  textAlign: isMobile ? 'center' : 'left'
+}}>
+
                 <div style={{
                   color: '#ffffff',
-                  fontSize: '14px',
+                  ontSize: isMobile?'14px':'20px',
                   opacity: 0.7,
                   marginBottom: '8px',
                   fontFamily: 'AwesomeSerif, serif'
@@ -278,7 +297,7 @@ function SongCard() {
                 </div>
                 <div style={{
                   color: '#ffffff',
-                  fontSize: '24px',
+                  fontSize: isMobile?'20px':'24px',
                   fontWeight: '400',
                   fontStyle: 'italic',
                   fontFamily: 'AwesomeSerif, serif'
@@ -287,16 +306,17 @@ function SongCard() {
                 </div>
               </div>
 
-              <div style={{
-                position: 'absolute',
-                left: '50%',
-                top: '40%',
-                transform: 'translateX(-50%)',
-                width: '60%',
-                height: '4px',
-                background: '#333',
-                borderRadius: '2px'
-              }}>
+             <div style={{
+  position: 'absolute',
+  left: '50%',
+  top: isMobile ? '60%' : '40%',
+  transform: 'translateX(-50%)',
+  width: isMobile ? '50%' : '60%',
+  height: '4px',
+  background: '#333',
+  borderRadius: '2px'
+}}>
+
                 <div style={{
                   width: `${progress}%`,
                   height: '100%',
@@ -333,10 +353,14 @@ function SongCard() {
                     <div
   style={{
     display: 'flex',
-    alignItems: 'left',
+    alignItems: 'center',
     gap: '5px',
     cursor: isGameOver ? 'not-allowed' : 'pointer',
-    opacity: isGameOver ? 0.3 : 1
+    opacity: isGameOver ? 0.3 : 1,
+    position: isMobile ? 'absolute' : 'static',
+    right: isMobile ? '12rem' : 'auto',
+    bottom: isMobile ? '5rem' : 'auto',
+    zIndex: isMobile ? 100 : 'auto',
   }}
   onClick={() => {
     if (!isGameOver) handleVolumeIconClick();
@@ -345,9 +369,15 @@ function SongCard() {
   <img
     src="/assets/images/dots.png"
     alt="volume dots"
-    style={{ height: '20px', paddingRight: '130px' ,paddingTop: '50px' }}
+    style={{
+      height: isMobile ? '12px' : '20px',
+      paddingRight: isMobile ? '0' : '130px',
+      paddingTop: isMobile ? '0' : '50px',
+    }}
   />
 </div>
+
+
 
 
                     {volume !== null && (
@@ -360,23 +390,25 @@ function SongCard() {
 
           {showPopup && (
             <div style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100vw',
-              height: '100vh',
-              background: 'rgba(0, 0, 0, 0.8)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10000
-            }}>
-              <div style={{
-                background: 'black',
-                border: '4px solid black',
-                padding: '20px',
-                borderRadius: '10px'
-              }}>
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  background: 'rgba(0, 0, 0, 0.8)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: isMobile ? 'flex-end' : 'center',
+  paddingRight: isMobile ? '20px' : '0',
+  zIndex: 10000
+}}>
+  <div style={{
+    background: 'black',
+    border: '4px solid black',
+    padding: '20px',
+    borderRadius: '10px',
+    marginRight: isMobile ? '10px' : '0'
+  }}>
                <PlingGame
   onVolumeSelect={(vol) => {
     if (audioRef.current) {
