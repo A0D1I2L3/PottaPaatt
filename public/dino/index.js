@@ -309,7 +309,7 @@
     const fontSize = 70 * scaleRatio;
     ctx.font = `${fontSize}px Verdana`;
     ctx.fillStyle = "grey";
-    const x = canvas.width / 4.5;
+    const x = canvas.width / 3.8;
     const y = canvas.height / 2;
     ctx.fillText("YOU DIED!", x, y);
   }

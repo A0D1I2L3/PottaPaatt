@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import "../styles/Home.css"
 const lines = [
   'They say music is the solution to all your problems.',
-  'They were wrong!',
+  'They were wrong.',
   'Introducing Pottapaatt.',
   'Are you ready?'
 ];
