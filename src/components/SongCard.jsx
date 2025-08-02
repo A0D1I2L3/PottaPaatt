@@ -280,7 +280,7 @@ function SongCard() {
   <img
     src="/assets/images/dots.png"
     alt="volume dots"
-    style={{ height: '32px', paddingRight: '90px' }}
+    style={{ height: '20px', paddingRight: '130px' ,paddingTop: '50px' }}
   />
 </div>
 
