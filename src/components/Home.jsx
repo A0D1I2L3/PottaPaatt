@@ -4,7 +4,7 @@ import "../styles/Home.css"
 const lines = [
   'They say music is the solution to all your problems',
   'They were wrong !',
-  'Introducing Pottapaatt',
+  'Introducing Pottapaatt.',
   'Are you ready?'
 ];
 
