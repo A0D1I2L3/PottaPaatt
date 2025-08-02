@@ -69,7 +69,7 @@ Now you get to listen to songs. Congrats!
 
 #### Screenshots
 
-![Home Page](image-2.png)
+![Home Page](image-6.png)
 *Landing page that looks deceptively functional.*
 
 ![Drag game](image-3.png)

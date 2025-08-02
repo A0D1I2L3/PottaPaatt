@@ -38,7 +38,7 @@ function SongMenu() {
   return (
     <div className="song-menu-container">
       <div className="song-menu-header">
-        <h1 className="title">Choose a song&nbsp; to listen to.</h1>
+        <h1 className="title">Choose a song to listen to.</h1>
         <p className="subtitle">We’ll let you listen to one of these. Maybe.</p>
       </div>
 
