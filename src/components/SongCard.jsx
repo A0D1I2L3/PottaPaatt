@@ -282,13 +282,13 @@ const isMobile = useIsMobile();
               <div style={{
   display: 'flex',
   flexDirection: 'column',
-  alignItems: isMobile ? 'center' : 'flex-start',
-  textAlign: isMobile ? 'center' : 'left'
+  alignItems: isMobile ? 'flex-start' : 'flex-start',
+  textAlign: isMobile ? 'left' : 'left'
 }}>
 
                 <div style={{
                   color: '#ffffff',
-                  ontSize: isMobile?'14px':'20px',
+                  fontSize: isMobile?'14px':'20px',
                   opacity: 0.7,
                   marginBottom: '8px',
                   fontFamily: 'AwesomeSerif, serif'
