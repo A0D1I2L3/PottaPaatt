@@ -34,8 +34,13 @@ function SongCard() {
   const [volume, setVolume] = useState(null);
   const [isPlingActive, setIsPlingActive] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+
   const audioRef = useRef(null);
   const dinoIframeRef = useRef(null);
+  const dragItemRef = useRef(null);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const touchStartTimeRef = useRef(0);
+  const touchStartPosRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     if (answer.join('') === stripped) {
@@ -47,17 +52,15 @@ function SongCard() {
     }
   }, [answer, stripped]);
 
- useEffect(() => {
+  useEffect(() => {
     const handleBackspace = (e) => {
       if (unlocked) return;
       if (e.key === 'Backspace') {
         e.preventDefault();
         setAnswer((prevAnswer) => {
           if (prevAnswer.length === 0) return prevAnswer;
-
           const updated = [...prevAnswer];
           const removedChar = updated.pop();
-
           setLetters((prevLetters) => [
             ...prevLetters,
             {
@@ -66,7 +69,6 @@ function SongCard() {
               position: getRandomPosition(),
             },
           ]);
-
           return updated;
         });
       }
@@ -75,38 +77,82 @@ function SongCard() {
     window.addEventListener('keydown', handleBackspace);
     return () => window.removeEventListener('keydown', handleBackspace);
   }, [unlocked]);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
     const updateProgress = () => {
       if (audio.duration) {
         setProgress((audio.currentTime / audio.duration) * 100);
       }
     };
-
     audio.addEventListener('timeupdate', updateProgress);
     return () => audio.removeEventListener('timeupdate', updateProgress);
   }, [unlocked]);
 
-  // Send pause/resume to DinoGame iframe
   useEffect(() => {
     if (!unlocked) return;
     const iframe = document.querySelector('iframe[title="DinoGame"]');
     if (!iframe) return;
-    if (showPopup) {
-      iframe.contentWindow?.postMessage('PAUSE', '*');
-    } else {
-      iframe.contentWindow?.postMessage('RESUME', '*');
-    }
+    iframe.contentWindow?.postMessage(showPopup ? 'PAUSE' : 'RESUME', '*');
   }, [showPopup, unlocked]);
+
+  useEffect(() => {
+    const handleTouchMove = (e) => {
+      if (!dragItemRef.current) return;
+      const touch = e.touches[0];
+      const el = dragItemRef.current;
+      el.style.position = 'fixed';
+      el.style.top = `${touch.clientY - dragOffsetRef.current.y}px`;
+      el.style.left = `${touch.clientX - dragOffsetRef.current.x}px`;
+      el.style.zIndex = 1000;
+      el.style.pointerEvents = 'none';
+    };
+
+    const handleTouchEnd = (e) => {
+      if (!dragItemRef.current) return;
+
+      const touch = e.changedTouches[0];
+      const dropZone = document.querySelector('.droppable-zone');
+      const dropRect = dropZone.getBoundingClientRect();
+
+      const tapDuration = Date.now() - touchStartTimeRef.current;
+      const distX = Math.abs(touch.clientX - touchStartPosRef.current.x);
+      const distY = Math.abs(touch.clientY - touchStartPosRef.current.y);
+      const isTap = tapDuration < 300 && distX < 10 && distY < 10;
+
+      if (
+        isTap ||
+        (touch.clientX >= dropRect.left &&
+         touch.clientX <= dropRect.right &&
+         touch.clientY >= dropRect.top &&
+         touch.clientY <= dropRect.bottom)
+      ) {
+        const id = dragItemRef.current.dataset.id;
+        const found = letters.find(l => l.id === id);
+        if (found) {
+          setAnswer(prev => [...prev, found.char]);
+          setLetters(prev => prev.filter(l => l.id !== id));
+        }
+      }
+
+      dragItemRef.current.style = '';
+      dragItemRef.current = null;
+    };
+
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
+    return () => {
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [letters]);
 
   const handleGameOver = () => {
     setIsGameOver(true);
     audioRef.current?.pause();
   };
 
-  // Only play audio after DinoGame sends GAME_STARTED (after user click)
   const handleGameStart = () => {
     if (!isGameOver && audioRef.current) {
       audioRef.current.play().catch(() => {});
@@ -123,7 +169,9 @@ function SongCard() {
   };
 
   const onDragStart = (e, id) => {
-    e.dataTransfer.setData('text/plain', id);
+    if (e.dataTransfer) {
+      e.dataTransfer.setData('text/plain', id);
+    }
   };
 
   const handleVolumeIconClick = () => {
@@ -152,13 +200,30 @@ function SongCard() {
           </div>
           <div className="drag-letter-pool">
             {letters.map(({ char, id, position }) => (
-              <span key={id}
-                    className="drag-letter"
-                    style={{ top: position.top, left: position.left }}
-                    draggable
-                    onDragStart={e => onDragStart(e, id)}>
-                {char}
-              </span>
+              <span
+  key={id}
+  className="drag-letter"
+  style={{ top: position.top, left: position.left }}
+  draggable
+  onDragStart={e => onDragStart(e, id)}
+  onTouchStart={e => {
+    const touch = e.touches[0];
+    touchStartTimeRef.current = Date.now();
+    touchStartPosRef.current = { x: touch.clientX, y: touch.clientY };
+
+    dragItemRef.current = e.target;
+    dragItemRef.current.dataset.id = id;
+
+    const rect = dragItemRef.current.getBoundingClientRect();
+    dragOffsetRef.current = {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    };
+  }}
+>
+  {char}
+</span>
+
             ))}
           </div>
         </>

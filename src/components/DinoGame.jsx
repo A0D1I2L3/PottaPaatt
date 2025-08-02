@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 export default function DinoGame({ onStart, onGameOver }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const iframeRef = useRef(null);
 
   useEffect(() => {
@@ -22,26 +23,42 @@ export default function DinoGame({ onStart, onGameOver }) {
     return () => window.removeEventListener('message', handler);
   }, [onGameOver, onStart]);
 
+  useEffect(() => {
+    // Check screen size only once on mount
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
   const handleIframeLoad = () => {
-    // Prevent restarting if game is over
     if (!gameStarted && !gameOver) {
-      // Wait for the iframe to send GAME_STARTED before setting gameStarted
+      // Wait for message
     }
   };
 
   return (
-    <iframe
-      ref={iframeRef}
-      src="/dino/index.html"
-      onLoad={handleIframeLoad}
-      style={{
-        width: '1920px',
-        height: '480px',
-        border: 'none',
-        marginTop: '300px',
-        backgroundColor: '#000000ff',
-      }}
-      title="DinoGame"
-    />
+    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+      <iframe
+        ref={iframeRef}
+        src="/dino/index.html"
+        onLoad={handleIframeLoad}
+        style={
+          isMobile
+            ? {
+                width: '100%',
+                maxWidth: '100vw',
+                aspectRatio: '2 / 0.5', // ~1920x480 equivalent
+                backgroundColor: '#000',
+                border: 'none',
+              }
+            : {
+                width: '1920px',
+                height: '480px',
+                backgroundColor: '#000',
+                border: 'none',
+                marginTop: '300px',
+              }
+        }
+        title="DinoGame"
+      />
+    </div>
   );
 }
